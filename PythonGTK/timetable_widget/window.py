@@ -18,7 +18,7 @@ class TimetableWindow(Gtk.Window):
         self.api = APIClient(self.config.backend_url)
         self.is_authenticated = False
         self.update_timer = None
-        self.update_interval = 60  # Fixed: 1 minute
+        self.update_interval = 5  # Fixed: 5 seconds
 
         # Window setup
         self.set_default_size(*self.config.size)
@@ -140,7 +140,7 @@ class TimetableWindow(Gtk.Window):
             self.is_authenticated = is_auth
 
             if is_auth:
-                self.status_label.set_markup("<i><small>Подключено • Обновление каждую минуту</small></i>")
+                self.status_label.set_markup("<i><small>Подключено • Обновление каждые 5 сек</small></i>")
                 self.update_timetable()
                 self.start_update_timer()
             else:
@@ -225,10 +225,10 @@ class TimetableWindow(Gtk.Window):
             self.lessons_box.remove(child)
 
     def start_update_timer(self):
-        """Start auto-update timer (every minute)"""
+        """Start auto-update timer (every 5 seconds)"""
         self.stop_update_timer()
         self.update_timer = GLib.timeout_add_seconds(
-            self.update_interval,  # 60 seconds
+            self.update_interval,  # 5 seconds
             self.on_timer_update
         )
 
