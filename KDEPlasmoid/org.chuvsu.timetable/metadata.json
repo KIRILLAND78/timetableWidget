@@ -1,0 +1,24 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "",
+                "Name": "Казаков Кирилл Валерьевич"
+            }
+        ],
+        "Category": "Education",
+        "Description": "Виджет расписания занятий Чувашского государственного университета",
+        "Icon": "view-calendar",
+        "Id": "org.chuvsu.timetable",
+        "License": "GPL-3.0",
+        "Name": "ЧувГУ Расписание",
+        "Version": "1.0.0",
+        "Website": "https://online.chuvsu.ru"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API": "declarativeappletscript",
+    "X-Plasma-MainScript": "ui/main.qml",
+    "X-Plasma-Provides": [
+        "org.chuvsu.timetable"
+    ]
+}
