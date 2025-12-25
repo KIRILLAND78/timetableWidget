@@ -1,0 +1,53 @@
+/* Header */
+.timetable-header {
+    font-size: 14pt;
+    font-weight: bold;
+    padding: 5px 0;
+}
+
+/* Day label */
+.timetable-day {
+    font-size: 10pt;
+    color: #888888;
+    font-style: italic;
+}
+
+/* Discipline name */
+.timetable-discipline {
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+/* Time and place info */
+.timetable-info {
+    font-size: 9pt;
+    color: #888888;
+    padding-left: 10px;
+}
+
+/* Status label */
+.timetable-status {
+    font-size: 9pt;
+    color: #888888;
+    font-style: italic;
+}
+
+/* Empty state */
+.timetable-empty {
+    font-size: 10pt;
+    color: #888888;
+    font-style: italic;
+    padding: 10px 0;
+}
+
+/* More lessons indicator */
+.timetable-more {
+    font-size: 9pt;
+    color: #4a90e2;
+    font-style: italic;
+}
+
+/* Login dialog */
+.timetable-login-dialog {
+    padding: 20px;
+}
