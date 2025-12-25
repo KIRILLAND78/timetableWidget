@@ -130,6 +130,13 @@ if command -v update-desktop-database &> /dev/null; then
     update-desktop-database "$DESKTOP_DIR" 2>/dev/null
 fi
 
+# Add to autostart
+echo "🔄 Adding to autostart..."
+AUTOSTART_DIR="$HOME/.config/autostart"
+mkdir -p "$AUTOSTART_DIR"
+cp "$DESKTOP_DIR/timetable-widget.desktop" "$AUTOSTART_DIR/"
+echo "✅ Widget will start automatically on login"
+
 echo "✅ Installation completed successfully!"
 if [ "$USE_VENV" = true ]; then
     echo "📦 Python dependencies installed using virtual environment"
@@ -139,13 +146,11 @@ fi
 echo ""
 echo "📝 Next steps:"
 echo "1. Start the backend: cd TimetableWidget.Backend && dotnet run"
-echo "2. Launch the widget:"
-echo "   - From terminal: timetable-widget"
-echo "   - From app menu: Search for 'ЧувГУ Расписание'"
-echo "   - Add to startup: Copy timetable-widget.desktop to ~/.config/autostart/"
+echo "2. Widget will start automatically on next login (or run: timetable-widget)"
 echo ""
 echo "🔄 To update: Run this script again"
 echo "🗑️  To uninstall:"
 echo "  sudo rm -rf /usr/local/lib/timetable-widget"
 echo "  sudo rm /usr/local/bin/timetable-widget"
 echo "  rm ~/.local/share/applications/timetable-widget.desktop"
+echo "  rm ~/.config/autostart/timetable-widget.desktop"

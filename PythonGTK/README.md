@@ -34,6 +34,13 @@ chmod +x install.sh
 ./install.sh
 ```
 
+**Это установит:**
+- Python зависимости (через system packages или venv)
+- Приложение в `/usr/local/lib/timetable-widget`
+- Launcher в `/usr/local/bin/timetable-widget`
+- Desktop entry в `~/.local/share/applications`
+- **Автозапуск** в `~/.config/autostart` ✨
+
 **Если возникает ошибка с символами `\r`:**
 ```bash
 # Установите dos2unix и исправьте файл
@@ -107,8 +114,16 @@ timetable-widget
 Найдите **"ЧувГУ Расписание"** в меню приложений
 
 ### Автозапуск:
+
+✅ **Автоматически настраивается при установке!**
+
+Отключить автозапуск:
 ```bash
-mkdir -p ~/.config/autostart
+rm ~/.config/autostart/timetable-widget.desktop
+```
+
+Включить обратно:
+```bash
 cp ~/.local/share/applications/timetable-widget.desktop ~/.config/autostart/
 ```
 

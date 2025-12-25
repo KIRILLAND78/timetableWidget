@@ -4,15 +4,41 @@ REST API бэкенд для виджета расписания ЧувГУ. П�
 
 ## 🚀 Запуск
 
+### Из исходников (разработка)
 ```bash
 cd TimetableWidget.Backend
 dotnet restore
 dotnet run
 ```
 
+### Из собранного executable (продакшн)
+```bash
+cd TimetableWidget.Backend
+./TimetableWidget.Backend
+```
+
 По умолчанию API запускается на:
-- HTTP: `http://localhost:5000`
-- HTTPS: `https://localhost:5001`
+- HTTP: `http://localhost:5678` (настраивается в appsettings.json)
+
+## ⚙️ Автозапуск
+
+Для автоматического запуска бэкенда при входе в систему:
+
+```bash
+cd TimetableWidget.Backend
+chmod +x setup-autostart.sh
+./setup-autostart.sh
+```
+
+**Что делает скрипт:**
+- Проверяет наличие исполняемого файла `TimetableWidget.Backend`
+- Создает .desktop файл в `~/.config/autostart/`
+- Бэкенд будет запускаться автоматически при входе в систему
+
+**Отключить автозапуск:**
+```bash
+rm ~/.config/autostart/timetable-backend.desktop
+```
 
 ## 📋 API Endpoints
 
@@ -79,7 +105,14 @@ dotnet run
 
 ```json
 {
-  "Urls": "http://localhost:5000;https://localhost:5001"
+  "Urls": "http://localhost:5678"
+}
+```
+
+Для HTTPS (опционально):
+```json
+{
+  "Urls": "http://localhost:5678;https://localhost:5679"
 }
 ```
 
