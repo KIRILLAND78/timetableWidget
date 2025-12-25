@@ -1,0 +1,87 @@
+/* Main container */
+.timetable-container {
+    background-color: rgba(30, 30, 30, 0.95);
+    border-radius: 15px;
+    padding: 15px;
+    min-width: 350px;
+    max-width: 450px;
+    border: 2px solid rgba(100, 100, 100, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Header */
+.timetable-header {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+/* Day label */
+.timetable-day {
+    font-size: 11pt;
+    color: #aaaaaa;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Lessons container */
+.timetable-lessons {
+    margin: 10px 0;
+}
+
+/* Individual lesson */
+.timetable-lesson {
+    background-color: rgba(50, 50, 50, 0.6);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-left: 3px solid #4a90e2;
+}
+
+/* Discipline name */
+.timetable-discipline {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 3px;
+}
+
+/* Time and place info */
+.timetable-info {
+    font-size: 9pt;
+    color: #b0b0b0;
+}
+
+/* Status label */
+.timetable-status {
+    font-size: 9pt;
+    color: #888888;
+    margin-top: 5px;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Empty state */
+.timetable-empty {
+    font-size: 11pt;
+    color: #888888;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* More lessons indicator */
+.timetable-more {
+    font-size: 9pt;
+    color: #4a90e2;
+    text-align: center;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Hover effect on container */
+.timetable-container:hover {
+    border-color: rgba(74, 144, 226, 0.5);
+}

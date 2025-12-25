@@ -1,0 +1,9 @@
+{
+    "uuid": "timetable@chuvsu",
+    "name": "ЧувГУ Расписание",
+    "description": "Виджет расписания занятий Чувашского государственного университета",
+    "version": "1.0.0",
+    "author": "Казаков Кирилл Валерьевич, КТ-31-21",
+    "max-instances": 1,
+    "prevent-decorations": false
+}
