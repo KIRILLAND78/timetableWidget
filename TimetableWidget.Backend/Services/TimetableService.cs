@@ -55,10 +55,11 @@ public class TimetableService : ITimetableService
             using var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiBaseUrl}/token");
 
             var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{email}:{password}"));
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Base", credentials);
-
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
+            
             var response = await _httpClient.SendAsync(request);
             var jsonStream = await response.Content.ReadAsStreamAsync();
+            var r = await response.Content.ReadAsStringAsync();
             var jsonDoc = await JsonDocument.ParseAsync(jsonStream);
 
             // Check for authentication errors
