@@ -1,7 +1,7 @@
 // API helper for backend communication
 .pragma library
 
-var backendUrl = "http://localhost:5000";
+var backendUrl = "http://localhost:5678";
 
 function setBackendUrl(url) {
     backendUrl = url;
