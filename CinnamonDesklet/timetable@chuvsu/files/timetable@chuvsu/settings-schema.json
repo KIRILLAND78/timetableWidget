@@ -1,0 +1,36 @@
+{
+    "group": {
+        "type": "spinbutton",
+        "default": 0,
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "description": "Подгруппа",
+        "tooltip": "Номер подгруппы (0 - все подгруппы)"
+    },
+    "transparency": {
+        "type": "scale",
+        "default": 100,
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "description": "Прозрачность (%)",
+        "tooltip": "Прозрачность виджета от 0 (невидимый) до 100 (непрозрачный)"
+    },
+    "backendUrl": {
+        "type": "entry",
+        "default": "http://localhost:5000",
+        "description": "URL бэкенда",
+        "tooltip": "Адрес API бэкенда (например: http://localhost:5000)"
+    },
+    "updateInterval": {
+        "type": "spinbutton",
+        "default": 300,
+        "min": 60,
+        "max": 3600,
+        "step": 60,
+        "units": "секунд",
+        "description": "Интервал обновления",
+        "tooltip": "Как часто обновлять расписание (в секундах)"
+    }
+}

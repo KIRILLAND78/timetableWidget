@@ -1,0 +1,17 @@
+{
+  "name": "ЧувГУ Расписание",
+  "description": "Виджет расписания занятий Чувашского государственного университета на верхней панели",
+  "uuid": "timetable@chuvsu.extensions.gnome.org",
+  "shell-version": [
+    "40",
+    "41",
+    "42",
+    "43",
+    "44",
+    "45",
+    "46"
+  ],
+  "version": 1,
+  "url": "https://online.chuvsu.ru",
+  "settings-schema": "org.gnome.shell.extensions.chuvsu-timetable"
+}

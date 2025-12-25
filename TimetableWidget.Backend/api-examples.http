@@ -1,0 +1,50 @@
+### TimetableWidget Backend API Examples
+### Используйте с расширением REST Client в VS Code
+
+@baseUrl = http://localhost:5000
+@email = your.email@example.com
+@password = your_password
+
+### 1. Проверить статус API
+GET {{baseUrl}}/
+
+### 2. Проверить статус авторизации
+GET {{baseUrl}}/api/auth/status
+
+### 3. Войти в систему
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### 4. Получить расписание на сегодня
+GET {{baseUrl}}/api/timetable/today
+
+### 5. Получить расписание на завтра
+GET {{baseUrl}}/api/timetable/tomorrow
+
+### 6. Получить настройки
+GET {{baseUrl}}/api/settings
+
+### 7. Обновить настройки
+PUT {{baseUrl}}/api/settings
+Content-Type: application/json
+
+{
+  "x": 100,
+  "y": 200,
+  "session": 0,
+  "group": 1,
+  "transparency": 85,
+  "draggable": true,
+  "debugMode": false
+}
+
+### 8. Сбросить позицию виджета
+POST {{baseUrl}}/api/settings/reset-position
+
+### 9. Выйти из системы
+POST {{baseUrl}}/api/auth/logout

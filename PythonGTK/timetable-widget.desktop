@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ЧувГУ Расписание
+Comment=Виджет расписания занятий Чувашского государственного университета
+Exec=python3 /usr/local/bin/timetable-widget
+Icon=x-office-calendar
+Terminal=false
+Categories=Education;Utility;
+StartupNotify=false
