@@ -8,7 +8,7 @@
 - GTK 3.0
 - PyGObject (python3-gi)
 - Requests
-- Запущенный TimetableWidget Backend API на `http://localhost:5000`
+- Запущенный TimetableWidget Backend API на `http://localhost:5678`
 
 ## 🎯 Поддерживаемые DE
 
@@ -30,6 +30,18 @@
 
 ```bash
 cd PythonGTK
+chmod +x install.sh
+./install.sh
+```
+
+**Если возникает ошибка с символами `\r`:**
+```bash
+# Установите dos2unix и исправьте файл
+sudo apt install dos2unix   # Debian/Ubuntu
+# или
+sudo dnf install dos2unix   # Fedora/RHEL
+
+dos2unix install.sh
 chmod +x install.sh
 ./install.sh
 ```
@@ -82,7 +94,7 @@ cd ../TimetableWidget.Backend
 dotnet run
 ```
 
-Backend должен работать на `http://localhost:5000`
+Backend должен работать на `http://localhost:5678`
 
 ## 🎮 Запуск приложения
 
@@ -136,7 +148,7 @@ cp ~/.local/share/applications/timetable-widget.desktop ~/.config/autostart/
 Нажмите кнопку **"Настройки"** для изменения:
 
 #### Подключение
-- **URL бэкенда** - адрес API (по умолчанию `http://localhost:5000`)
+- **URL бэкенда** - адрес API (по умолчанию `http://localhost:5678`)
 
 #### Расписание
 - **Подгруппа** - фильтр по подгруппе (0 = все подгруппы)
@@ -178,7 +190,7 @@ PythonGTK/
 Пример:
 ```json
 {
-  "backend_url": "http://localhost:5000",
+  "backend_url": "http://localhost:5678",
   "x": 100,
   "y": 100,
   "width": 400,
@@ -203,7 +215,7 @@ python3 -c "import requests; print('Requests OK')"
 
 ### "Backend недоступен"
 
-- Убедитесь что backend запущен: `curl http://localhost:5000/`
+- Убедитесь что backend запущен: `curl http://localhost:5678/`
 - Проверьте URL в настройках
 - Проверьте firewall
 

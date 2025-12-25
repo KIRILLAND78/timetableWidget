@@ -5,7 +5,7 @@
 ## 📋 Требования
 
 - GNOME Shell 40+ (Ubuntu 21.04+, Fedora 34+, и др.)
-- Запущенный TimetableWidget Backend API на `http://localhost:5000`
+- Запущенный TimetableWidget Backend API на `http://localhost:5678`
 
 ## 🚀 Установка
 
@@ -13,6 +13,18 @@
 
 ```bash
 cd GNOMEExtension
+chmod +x install.sh
+./install.sh
+```
+
+**Если возникает ошибка с символами `\r`:**
+```bash
+# Установите dos2unix и исправьте файл
+sudo apt install dos2unix   # Debian/Ubuntu
+# или
+sudo dnf install dos2unix   # Fedora/RHEL
+
+dos2unix install.sh
 chmod +x install.sh
 ./install.sh
 ```
@@ -46,7 +58,7 @@ cd ../TimetableWidget.Backend
 dotnet run
 ```
 
-Backend должен работать на `http://localhost:5000`
+Backend должен работать на `http://localhost:5678`
 
 ## 🔧 Использование
 
@@ -90,7 +102,7 @@ gnome-extensions prefs timetable@chuvsu.extensions.gnome.org
 Доступные настройки:
 
 #### Подключение
-- **URL бэкенда** - адрес API (по умолчанию `http://localhost:5000`)
+- **URL бэкенда** - адрес API (по умолчанию `http://localhost:5678`)
 
 #### Расписание
 - **Подгруппа** - фильтр по подгруппе (0 = все подгруппы)
@@ -172,7 +184,7 @@ ls ~/.local/share/gnome-shell/extensions/
 
 ### "Backend недоступен"
 
-- Убедитесь что backend запущен: `curl http://localhost:5000/`
+- Убедитесь что backend запущен: `curl http://localhost:5678/`
 - Проверьте URL в настройках
 - Проверьте firewall
 
