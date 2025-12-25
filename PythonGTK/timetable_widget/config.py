@@ -29,7 +29,7 @@ class Config:
     def _default_config(self):
         """Get default configuration"""
         return {
-            'backend_url': 'http://localhost:5000',
+            'backend_url': 'http://localhost:5678',
             'x': 100,
             'y': 100,
             'width': 400,

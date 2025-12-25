@@ -31,11 +31,11 @@ Item {
                 PlasmaComponents3.TextField {
                     id: backendUrlField
                     Layout.fillWidth: true
-                    placeholderText: "http://localhost:5000"
+                    placeholderText: "http://localhost:5678"
                 }
 
                 PlasmaComponents3.Label {
-                    text: "Адрес API сервера (обычно http://localhost:5000)"
+                    text: "Адрес API сервера (обычно http://localhost:5678)"
                     font.pointSize: 8
                     color: "gray"
                     wrapMode: Text.WordWrap

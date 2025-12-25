@@ -173,7 +173,7 @@ Item {
 
     // Functions
     function checkAuthStatus() {
-        API.setBackendUrl(plasmoid.configuration.backendUrl || "http://localhost:5000")
+        API.setBackendUrl(plasmoid.configuration.backendUrl || "http://localhost:5678")
 
         API.checkAuthStatus(function(status, response) {
             if (status === 200 && response) {

@@ -3,7 +3,7 @@
   <schema id="org.gnome.shell.extensions.chuvsu-timetable" path="/org/gnome/shell/extensions/chuvsu-timetable/">
 
     <key name="backend-url" type="s">
-      <default>'http://localhost:5000'</default>
+      <default>'http://localhost:5678'</default>
       <summary>Backend URL</summary>
       <description>URL адрес API бэкенда</description>
     </key>

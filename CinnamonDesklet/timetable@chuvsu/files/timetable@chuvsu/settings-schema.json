@@ -19,9 +19,9 @@
     },
     "backendUrl": {
         "type": "entry",
-        "default": "http://localhost:5000",
+        "default": "http://localhost:5678",
         "description": "URL бэкенда",
-        "tooltip": "Адрес API бэкенда (например: http://localhost:5000)"
+        "tooltip": "Адрес API бэкенда (например: http://localhost:5678)"
     },
     "updateInterval": {
         "type": "spinbutton",
