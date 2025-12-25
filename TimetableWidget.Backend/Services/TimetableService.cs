@@ -16,6 +16,11 @@ public class TimetableService : ITimetableService
     private DateTime _lastUpdate = DateTime.MinValue;
     private bool _isToday = true;
 
+    // Cache fields
+    private TimetableResponse? _cachedTimetableResponse;
+    private DateTime _cacheTimestamp = DateTime.MinValue;
+    private const int CacheDurationMinutes = 5;
+
     private const string ApiBaseUrl = "https://online.chuvsu.ru/api/v2";
 
     public TimetableService(
@@ -97,6 +102,10 @@ public class TimetableService : ITimetableService
             _state = "Nominal";
             _lastUpdate = DateTime.MinValue;
 
+            // Clear cache on new login
+            _cachedTimetableResponse = null;
+            _cacheTimestamp = DateTime.MinValue;
+
             _logger.LogInformation("Login successful for session: {SessionId}", sessionId);
 
             return new LoginResponse
@@ -132,6 +141,10 @@ public class TimetableService : ITimetableService
 
             _state = "Not logged";
             _lastUpdate = DateTime.MinValue;
+
+            // Clear cache
+            _cachedTimetableResponse = null;
+            _cacheTimestamp = DateTime.MinValue;
 
             _logger.LogInformation("Logout successful");
             return await Task.FromResult(true);
@@ -187,11 +200,14 @@ public class TimetableService : ITimetableService
                 _isToday = true;
             }
 
-            if (!forcedUpdate && _lastUpdate > DateTime.Now.AddMinutes(-30))
+            // Check cache - return cached data if fresh (within 5 minutes)
+            if (!forcedUpdate &&
+                _cachedTimetableResponse != null &&
+                _cacheTimestamp > DateTime.Now.AddMinutes(-CacheDurationMinutes))
             {
-                // Use cached data
-                response.State = _state;
-                return response;
+                _logger.LogDebug("Returning cached timetable data (age: {Age} seconds)",
+                    (DateTime.Now - _cacheTimestamp).TotalSeconds);
+                return _cachedTimetableResponse;
             }
 
             // Fetch timetable
@@ -260,6 +276,11 @@ public class TimetableService : ITimetableService
             response.LastUpdate = _lastUpdate;
             response.DayName = GetDayName();
             response.WeekDayName = GetWeekDayName();
+
+            // Update cache
+            _cachedTimetableResponse = response;
+            _cacheTimestamp = DateTime.Now;
+            _logger.LogDebug("Timetable data cached at {Timestamp}", _cacheTimestamp);
 
             return response;
         }
