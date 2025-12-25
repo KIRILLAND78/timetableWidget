@@ -16,9 +16,11 @@ public class TimetableService : ITimetableService
     private DateTime _lastUpdate = DateTime.MinValue;
     private bool _isToday = true;
 
-    // Cache fields
-    private TimetableResponse? _cachedTimetableResponse;
-    private DateTime _cacheTimestamp = DateTime.MinValue;
+    // Cache fields - separate caches for today and tomorrow
+    private TimetableResponse? _cachedTodayResponse;
+    private DateTime _todayCacheTimestamp = DateTime.MinValue;
+    private TimetableResponse? _cachedTomorrowResponse;
+    private DateTime _tomorrowCacheTimestamp = DateTime.MinValue;
     private const int CacheDurationMinutes = 5;
 
     private const string ApiBaseUrl = "https://online.chuvsu.ru/api/v2";
@@ -103,8 +105,10 @@ public class TimetableService : ITimetableService
             _lastUpdate = DateTime.MinValue;
 
             // Clear cache on new login
-            _cachedTimetableResponse = null;
-            _cacheTimestamp = DateTime.MinValue;
+            _cachedTodayResponse = null;
+            _todayCacheTimestamp = DateTime.MinValue;
+            _cachedTomorrowResponse = null;
+            _tomorrowCacheTimestamp = DateTime.MinValue;
 
             _logger.LogInformation("Login successful for session: {SessionId}", sessionId);
 
@@ -143,8 +147,10 @@ public class TimetableService : ITimetableService
             _lastUpdate = DateTime.MinValue;
 
             // Clear cache
-            _cachedTimetableResponse = null;
-            _cacheTimestamp = DateTime.MinValue;
+            _cachedTodayResponse = null;
+            _todayCacheTimestamp = DateTime.MinValue;
+            _cachedTomorrowResponse = null;
+            _tomorrowCacheTimestamp = DateTime.MinValue;
 
             _logger.LogInformation("Logout successful");
             return await Task.FromResult(true);
@@ -189,29 +195,22 @@ public class TimetableService : ITimetableService
                 return response;
             }
 
-            // Check if update is needed
-            var forcedUpdate = false;
-            var lastUpdateNextDay = _lastUpdate.AddDays(1).ToUniversalTime().AddHours(3).AddMinutes(-10).Date;
-            var todayDate = DateTime.UtcNow.AddHours(3).Date;
+            // Select cache based on requested day
+            var cacheTimestamp = today ? _todayCacheTimestamp : _tomorrowCacheTimestamp;
+            var cachedResponse = today ? _cachedTodayResponse : _cachedTomorrowResponse;
 
-            if (lastUpdateNextDay < todayDate)
+            // Check if cache is fresh (within 5 minutes)
+            if (cachedResponse != null &&
+                cacheTimestamp > DateTime.Now.AddMinutes(-CacheDurationMinutes))
             {
-                forcedUpdate = true;
-                _isToday = true;
+                _logger.LogDebug("Returning cached {Day} timetable (age: {Age} seconds)",
+                    today ? "today" : "tomorrow",
+                    (DateTime.Now - cacheTimestamp).TotalSeconds);
+                return cachedResponse;
             }
 
-            // Check cache - return cached data if fresh (within 5 minutes)
-            if (!forcedUpdate &&
-                _cachedTimetableResponse != null &&
-                _cacheTimestamp > DateTime.Now.AddMinutes(-CacheDurationMinutes))
-            {
-                _logger.LogDebug("Returning cached timetable data (age: {Age} seconds)",
-                    (DateTime.Now - _cacheTimestamp).TotalSeconds);
-                return _cachedTimetableResponse;
-            }
-
-            // Fetch timetable
-            var endpoint = _isToday ? "today" : "tomorrow";
+            // Fetch timetable from API
+            var endpoint = today ? "today" : "tomorrow";
             using var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiBaseUrl}/schedule/{endpoint}");
 
             var authToken = $"{settings.Session}:{token}";
@@ -224,7 +223,7 @@ public class TimetableService : ITimetableService
             var jsonDoc = JsonDocument.Parse(json);
 
             var items = new List<TimetableItem>();
-            var switchToTomorrow = _isToday;
+            var allLessonsOver = today; // Only check for "today" requests
 
             if (jsonDoc.RootElement.TryGetProperty("items", out var itemsProperty))
             {
@@ -242,7 +241,7 @@ public class TimetableService : ITimetableService
                             var endTime = DateTime.Parse(lesson.GetProperty("end_time").GetString()!);
                             if (endTime > DateTime.UtcNow.AddHours(3).AddMinutes(10))
                             {
-                                switchToTomorrow = false;
+                                allLessonsOver = false;
                             }
 
                             var item = new TimetableItem
@@ -261,15 +260,17 @@ public class TimetableService : ITimetableService
                 }
             }
 
-            // If all lessons are over, switch to tomorrow
-            if (switchToTomorrow && _isToday)
+            // If all today's lessons are over, auto-switch to tomorrow
+            if (allLessonsOver && today)
             {
-                _isToday = false;
+                _logger.LogDebug("All today's lessons are over, switching to tomorrow");
+                _isToday = false; // Update internal state for GetDayName()
                 return await GetTimetableAsync(false);
             }
 
             _lastUpdate = DateTime.Now;
             _state = "Nominal";
+            _isToday = today; // Update internal state for GetDayName()
 
             response.State = _state;
             response.Items = items;
@@ -277,10 +278,19 @@ public class TimetableService : ITimetableService
             response.DayName = GetDayName();
             response.WeekDayName = GetWeekDayName();
 
-            // Update cache
-            _cachedTimetableResponse = response;
-            _cacheTimestamp = DateTime.Now;
-            _logger.LogDebug("Timetable data cached at {Timestamp}", _cacheTimestamp);
+            // Cache the response
+            if (today)
+            {
+                _cachedTodayResponse = response;
+                _todayCacheTimestamp = DateTime.Now;
+                _logger.LogDebug("Today's timetable cached at {Timestamp}", _todayCacheTimestamp);
+            }
+            else
+            {
+                _cachedTomorrowResponse = response;
+                _tomorrowCacheTimestamp = DateTime.Now;
+                _logger.LogDebug("Tomorrow's timetable cached at {Timestamp}", _tomorrowCacheTimestamp);
+            }
 
             return response;
         }
