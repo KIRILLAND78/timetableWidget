@@ -72,7 +72,7 @@ dotnet restore
 dotnet run
 ```
 
-Backend запустится на `http://localhost:5000`
+Backend запустится на `http://localhost:5678`
 
 ### 2. Запустить Frontend
 

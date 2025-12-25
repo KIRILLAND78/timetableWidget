@@ -8,140 +8,8 @@ from .api_client import APIClient
 from .config import Config
 
 
-class LoginDialog(Gtk.Dialog):
-    """Login dialog for authentication"""
-
-    def __init__(self, parent):
-        super().__init__(title="Авторизация ЧувГУ", parent=parent)
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
-
-        self.set_default_size(400, 200)
-        box = self.get_content_area()
-        box.set_spacing(10)
-        box.set_margin_start(20)
-        box.set_margin_end(20)
-        box.set_margin_top(20)
-        box.set_margin_bottom(20)
-
-        # Title
-        title = Gtk.Label()
-        title.set_markup("<b>Вход в систему Мой ЧувГУ</b>")
-        box.pack_start(title, False, False, 5)
-
-        # Email
-        email_label = Gtk.Label(label="Email:")
-        email_label.set_halign(Gtk.Align.START)
-        box.pack_start(email_label, False, False, 0)
-
-        self.email_entry = Gtk.Entry()
-        self.email_entry.set_placeholder_text("student@example.com")
-        box.pack_start(self.email_entry, False, False, 0)
-
-        # Password
-        password_label = Gtk.Label(label="Пароль:")
-        password_label.set_halign(Gtk.Align.START)
-        box.pack_start(password_label, False, False, 0)
-
-        self.password_entry = Gtk.Entry()
-        self.password_entry.set_visibility(False)
-        self.password_entry.set_placeholder_text("••••••••")
-        box.pack_start(self.password_entry, False, False, 0)
-
-        # Error label
-        self.error_label = Gtk.Label()
-        self.error_label.set_markup("<span color='red'></span>")
-        box.pack_start(self.error_label, False, False, 5)
-
-        self.show_all()
-
-    def get_credentials(self):
-        """Get entered credentials"""
-        return self.email_entry.get_text(), self.password_entry.get_text()
-
-    def show_error(self, message):
-        """Show error message"""
-        self.error_label.set_markup(f"<span color='red'>{message}</span>")
-
-
-class SettingsDialog(Gtk.Dialog):
-    """Settings dialog"""
-
-    def __init__(self, parent, config):
-        super().__init__(title="Настройки", parent=parent)
-        self.config = config
-        self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OK, Gtk.ResponseType.OK
-        )
-
-        self.set_default_size(400, 300)
-        box = self.get_content_area()
-        box.set_spacing(10)
-        box.set_margin_start(20)
-        box.set_margin_end(20)
-        box.set_margin_top(20)
-        box.set_margin_bottom(20)
-
-        # Backend URL
-        url_label = Gtk.Label(label="URL бэкенда:")
-        url_label.set_halign(Gtk.Align.START)
-        box.pack_start(url_label, False, False, 0)
-
-        self.url_entry = Gtk.Entry()
-        self.url_entry.set_text(config.backend_url)
-        box.pack_start(self.url_entry, False, False, 0)
-
-        # Group
-        group_label = Gtk.Label(label="Подгруппа (0 = все):")
-        group_label.set_halign(Gtk.Align.START)
-        box.pack_start(group_label, False, False, 0)
-
-        self.group_spin = Gtk.SpinButton()
-        self.group_spin.set_range(0, 10)
-        self.group_spin.set_increments(1, 1)
-        self.group_spin.set_value(config.group)
-        box.pack_start(self.group_spin, False, False, 0)
-
-        # Transparency
-        trans_label = Gtk.Label(label=f"Прозрачность: {int(config.transparency * 100)}%")
-        trans_label.set_halign(Gtk.Align.START)
-        box.pack_start(trans_label, False, False, 0)
-
-        self.trans_scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 100, 5)
-        self.trans_scale.set_value(config.transparency * 100)
-        self.trans_scale.connect("value-changed", lambda s: trans_label.set_text(
-            f"Прозрачность: {int(s.get_value())}%"
-        ))
-        box.pack_start(self.trans_scale, False, False, 0)
-
-        # Update interval
-        interval_label = Gtk.Label(label="Интервал обновления (сек):")
-        interval_label.set_halign(Gtk.Align.START)
-        box.pack_start(interval_label, False, False, 0)
-
-        self.interval_spin = Gtk.SpinButton()
-        self.interval_spin.set_range(60, 3600)
-        self.interval_spin.set_increments(60, 60)
-        self.interval_spin.set_value(config.update_interval)
-        box.pack_start(self.interval_spin, False, False, 0)
-
-        self.show_all()
-
-    def get_values(self):
-        """Get settings values"""
-        return {
-            'backend_url': self.url_entry.get_text(),
-            'group': int(self.group_spin.get_value()),
-            'transparency': self.trans_scale.get_value() / 100,
-            'update_interval': int(self.interval_spin.get_value())
-        }
-
-
 class TimetableWindow(Gtk.Window):
-    """Main timetable window"""
+    """Main timetable window - companion app"""
 
     def __init__(self):
         super().__init__(title="ЧувГУ Расписание")
@@ -150,6 +18,7 @@ class TimetableWindow(Gtk.Window):
         self.api = APIClient(self.config.backend_url)
         self.is_authenticated = False
         self.update_timer = None
+        self.update_interval = 5  # Fixed: 5 seconds
 
         # Window setup
         self.set_default_size(*self.config.size)
@@ -157,6 +26,11 @@ class TimetableWindow(Gtk.Window):
         self.set_decorated(False)  # Frameless
         self.set_keep_below(True)  # Keep below other windows
         self.stick()  # Show on all workspaces
+
+        # Hide from taskbar - make it a companion app
+        self.set_type_hint(Gdk.WindowTypeHint.DOCK)
+        self.set_skip_taskbar_hint(True)
+        self.set_skip_pager_hint(True)
 
         # Set transparency
         screen = self.get_screen()
@@ -175,7 +49,7 @@ class TimetableWindow(Gtk.Window):
         # Build UI
         self.build_ui()
 
-        # Check auth status
+        # Check auth status and start auto-update
         GLib.timeout_add(100, self.check_auth_status)
 
     def build_ui(self):
@@ -232,24 +106,6 @@ class TimetableWindow(Gtk.Window):
         self.status_label.set_markup("<i><small>Загрузка...</small></i>")
         main_box.pack_start(self.status_label, False, False, 0)
 
-        # Buttons
-        button_box = Gtk.Box(spacing=10)
-
-        self.login_button = Gtk.Button(label="Войти")
-        self.login_button.connect("clicked", self.on_login_clicked)
-        button_box.pack_start(self.login_button, True, True, 0)
-
-        self.settings_button = Gtk.Button(label="Настройки")
-        self.settings_button.connect("clicked", self.on_settings_clicked)
-        button_box.pack_start(self.settings_button, True, True, 0)
-
-        self.logout_button = Gtk.Button(label="Выйти")
-        self.logout_button.connect("clicked", self.on_logout_clicked)
-        self.logout_button.set_no_show_all(True)
-        button_box.pack_start(self.logout_button, True, True, 0)
-
-        main_box.pack_start(button_box, False, False, 0)
-
         self.add(main_box)
         self.show_all()
 
@@ -284,83 +140,19 @@ class TimetableWindow(Gtk.Window):
             self.is_authenticated = is_auth
 
             if is_auth:
-                self.status_label.set_markup("<i><small>Подключено</small></i>")
-                self.login_button.set_label("Обновить")
-                self.logout_button.show()
+                self.status_label.set_markup("<i><small>Подключено • Обновление каждые 5 сек</small></i>")
                 self.update_timetable()
                 self.start_update_timer()
             else:
-                self.status_label.set_markup("<i><small>Нажмите 'Войти'</small></i>")
-                self.login_button.set_label("Войти")
-                self.logout_button.hide()
+                self.status_label.set_markup("<i><small>Ожидание авторизации через бэкенд...</small></i>")
+                # Retry auth check in 10 seconds
+                GLib.timeout_add_seconds(10, self.check_auth_status)
         except Exception as e:
-            self.status_label.set_markup(f"<i><small>Backend недоступен</small></i>")
+            self.status_label.set_markup(f"<i><small>Backend недоступен • Повтор через 10 сек</small></i>")
+            # Retry connection in 10 seconds
+            GLib.timeout_add_seconds(10, self.check_auth_status)
 
         return False  # Don't repeat
-
-    def on_login_clicked(self, button):
-        """Handle login button click"""
-        if self.is_authenticated:
-            self.update_timetable()
-        else:
-            dialog = LoginDialog(self)
-            response = dialog.run()
-
-            if response == Gtk.ResponseType.OK:
-                email, password = dialog.get_credentials()
-                if email and password:
-                    success, message = self.api.login(email, password)
-                    if success:
-                        dialog.destroy()
-                        self.is_authenticated = True
-                        self.status_label.set_markup("<i><small>Подключено</small></i>")
-                        self.login_button.set_label("Обновить")
-                        self.logout_button.show()
-                        self.update_timetable()
-                        self.start_update_timer()
-                    else:
-                        dialog.show_error(message)
-                        return
-                else:
-                    dialog.show_error("Заполните все поля")
-                    return
-
-            dialog.destroy()
-
-    def on_logout_clicked(self, button):
-        """Handle logout button click"""
-        self.api.logout()
-        self.is_authenticated = False
-        self.status_label.set_markup("<i><small>Вышли</small></i>")
-        self.login_button.set_label("Войти")
-        self.logout_button.hide()
-        self.stop_update_timer()
-        self.clear_lessons()
-
-    def on_settings_clicked(self, button):
-        """Handle settings button click"""
-        dialog = SettingsDialog(self, self.config)
-        response = dialog.run()
-
-        if response == Gtk.ResponseType.OK:
-            values = dialog.get_values()
-            self.config.backend_url = values['backend_url']
-            self.config.group = values['group']
-            self.config.transparency = values['transparency']
-            self.config.update_interval = values['update_interval']
-
-            # Update API client
-            self.api = APIClient(self.config.backend_url)
-
-            # Update window transparency
-            self.set_opacity(self.config.transparency)
-
-            # Restart timer if authenticated
-            if self.is_authenticated:
-                self.start_update_timer()
-                self.update_timetable()
-
-        dialog.destroy()
 
     def update_timetable(self):
         """Update timetable data"""
@@ -433,10 +225,10 @@ class TimetableWindow(Gtk.Window):
             self.lessons_box.remove(child)
 
     def start_update_timer(self):
-        """Start auto-update timer"""
+        """Start auto-update timer (every 5 seconds)"""
         self.stop_update_timer()
         self.update_timer = GLib.timeout_add_seconds(
-            self.config.update_interval,
+            self.update_interval,  # 5 seconds
             self.on_timer_update
         )
 
