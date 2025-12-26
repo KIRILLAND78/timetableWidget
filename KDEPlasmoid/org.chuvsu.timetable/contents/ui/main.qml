@@ -1,14 +1,14 @@
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.plasmoid 2.0
-import org.kde.plasma.components 3.0 as PlasmaComponents3
+import QtQuick
+import QtQuick.Layouts
+import org.kde.plasma.plasmoid
+import org.kde.plasma.components as PlasmaComponents3
+import org.kde.kirigami as Kirigami
 import "../code/api.js" as API
 
 Item {
     id: root
 
-    Plasmoid.backgroundHints: PlasmaCore.Types.DefaultBackground | PlasmaCore.Types.ConfigurableBackground
+    Plasmoid.backgroundHints: "DefaultBackground"
 
     width: 400
     height: 500
@@ -62,7 +62,7 @@ Item {
             id: dayLabel
             text: "Загрузка..."
             font.pointSize: 10
-            color: PlasmaCore.Theme.disabledTextColor
+            color: Kirigami.Theme.disabledTextColor
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
         }
@@ -71,7 +71,7 @@ Item {
         Rectangle {
             Layout.fillWidth: true
             height: 1
-            color: PlasmaCore.Theme.highlightColor
+            color: Kirigami.Theme.highlightColor
             opacity: 0.3
         }
 
@@ -88,9 +88,9 @@ Item {
                 delegate: Rectangle {
                     width: lessonsList.width
                     height: lessonContent.height + 16
-                    color: PlasmaCore.Theme.backgroundColor
+                    color: Kirigami.Theme.backgroundColor
                     radius: 8
-                    border.color: PlasmaCore.Theme.highlightColor
+                    border.color: Kirigami.Theme.highlightColor
                     border.width: 1
 
                     ColumnLayout {
@@ -110,7 +110,7 @@ Item {
                         PlasmaComponents3.Label {
                             text: model.startTime + " - " + model.endTime + "   " + model.cabinet + "   " + model.type
                             font.pointSize: 9
-                            color: PlasmaCore.Theme.disabledTextColor
+                            color: Kirigami.Theme.disabledTextColor
                             Layout.fillWidth: true
                         }
                     }
@@ -123,7 +123,7 @@ Item {
                     visible: lessonsModel.count === 0
                     font.pointSize: 10
                     font.italic: true
-                    color: PlasmaCore.Theme.disabledTextColor
+                    color: Kirigami.Theme.disabledTextColor
                 }
             }
         }
@@ -132,7 +132,7 @@ Item {
         Rectangle {
             Layout.fillWidth: true
             height: 1
-            color: PlasmaCore.Theme.highlightColor
+            color: Kirigami.Theme.highlightColor
             opacity: 0.3
         }
 
@@ -146,7 +146,7 @@ Item {
                 text: "Загрузка..."
                 font.pointSize: 8
                 font.italic: true
-                color: PlasmaCore.Theme.disabledTextColor
+                color: Kirigami.Theme.disabledTextColor
                 Layout.fillWidth: true
             }
 

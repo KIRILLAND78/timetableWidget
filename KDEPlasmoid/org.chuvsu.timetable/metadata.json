@@ -12,13 +12,10 @@
         "Id": "org.chuvsu.timetable",
         "License": "GPL-3.0",
         "Name": "ЧувГУ Расписание",
-        "Version": "1.0.0",
+        "Version": "2.0.0",
         "Website": "https://online.chuvsu.ru"
     },
     "KPackageStructure": "Plasma/Applet",
-    "X-Plasma-API": "declarativeappletscript",
-    "X-Plasma-MainScript": "ui/main.qml",
-    "X-Plasma-Provides": [
-        "org.chuvsu.timetable"
-    ]
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-MainScript": "ui/main.qml"
 }
