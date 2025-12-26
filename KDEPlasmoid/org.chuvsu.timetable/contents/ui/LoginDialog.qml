@@ -1,8 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import org.kde.plasma.components 3.0 as PlasmaComponents3
-import org.kde.plasma.core 2.0 as PlasmaCore
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import org.kde.plasma.components as PlasmaComponents3
+import org.kde.kirigami as Kirigami
 import "../code/api.js" as API
 
 Dialog {
@@ -89,7 +89,7 @@ Dialog {
             PlasmaComponents3.Label {
                 text: "Соглашение:"
                 font.pointSize: 8
-                color: PlasmaCore.Theme.disabledTextColor
+                color: Kirigami.Theme.disabledTextColor
             }
 
             PlasmaComponents3.Label {
