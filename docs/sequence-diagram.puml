@@ -1,0 +1,130 @@
+@startuml Sequence Diagram - User Login and Timetable Fetch
+!theme plain
+
+skinparam backgroundColor #FEFEFE
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 10
+
+title Диаграмма последовательности - Авторизация и получение расписания
+
+actor Пользователь as User
+participant "Клиент\n(любой UI)" as Client
+participant "Backend\nAuthController" as AuthCtrl
+participant "Backend\nTokenStoreService" as TokenStore
+participant "Backend\nTimetableController" as TimetableCtrl
+participant "Backend\nTimetableService" as TimetableService
+database "settings.json\ntokens.encrypted" as Storage
+participant "ЧувГУ API\nonline.chuvsu.ru" as ChuvsuAPI
+
+== Авторизация ==
+
+User -> Client: Вводит логин/пароль
+activate Client
+
+Client -> AuthCtrl: POST /api/auth/login\n{"username": "user", "password": "pass"}
+activate AuthCtrl
+
+AuthCtrl -> ChuvsuAPI: POST /auth/login
+activate ChuvsuAPI
+ChuvsuAPI --> AuthCtrl: {"access_token": "...", "refresh_token": "..."}
+deactivate ChuvsuAPI
+
+AuthCtrl -> TokenStore: SaveTokens(tokens)
+activate TokenStore
+TokenStore -> Storage: Шифрует и сохраняет токены
+activate Storage
+Storage --> TokenStore: OK
+deactivate Storage
+TokenStore --> AuthCtrl: OK
+deactivate TokenStore
+
+AuthCtrl --> Client: {"success": true}
+deactivate AuthCtrl
+
+Client --> User: "Авторизация успешна"
+deactivate Client
+
+== Получение расписания ==
+
+User -> Client: Открывает виджет
+activate Client
+
+Client -> TimetableCtrl: GET /api/timetable/today
+activate TimetableCtrl
+
+TimetableCtrl -> TimetableService: GetTodayTimetable()
+activate TimetableService
+
+TimetableService -> TokenStore: GetAccessToken()
+activate TokenStore
+TokenStore -> Storage: Читает зашифрованный токен
+activate Storage
+Storage --> TokenStore: encrypted token
+deactivate Storage
+TokenStore --> TimetableService: access_token
+deactivate TokenStore
+
+TimetableService -> ChuvsuAPI: GET /timetable/today\nAuthorization: Bearer {token}
+activate ChuvsuAPI
+
+alt Токен действителен
+    ChuvsuAPI --> TimetableService: Данные расписания (JSON)
+
+else Токен истек
+    ChuvsuAPI --> TimetableService: 401 Unauthorized
+    TimetableService -> TokenStore: GetRefreshToken()
+    activate TokenStore
+    TokenStore --> TimetableService: refresh_token
+    deactivate TokenStore
+
+    TimetableService -> ChuvsuAPI: POST /auth/refresh\n{"refresh_token": "..."}
+    ChuvsuAPI --> TimetableService: {"access_token": "new_token"}
+
+    TimetableService -> TokenStore: SaveAccessToken(new_token)
+    activate TokenStore
+    TokenStore -> Storage: Обновляет токен
+    Storage --> TokenStore: OK
+    deactivate TokenStore
+
+    TimetableService -> ChuvsuAPI: GET /timetable/today\nAuthorization: Bearer {new_token}
+    ChuvsuAPI --> TimetableService: Данные расписания (JSON)
+end
+
+deactivate ChuvsuAPI
+
+TimetableService -> TimetableService: Кэширует расписание
+TimetableService --> TimetableCtrl: Parsed timetable data
+deactivate TimetableService
+
+TimetableCtrl --> Client: JSON Response\n[{subject, time, teacher, room}]
+deactivate TimetableCtrl
+
+Client -> Client: Отображает расписание\nв нативном UI
+Client --> User: Показывает занятия
+deactivate Client
+
+== Автообновление ==
+
+loop Каждые 15 минут
+    Client -> TimetableCtrl: GET /api/timetable/today
+    activate TimetableCtrl
+
+    TimetableCtrl -> TimetableService: GetTodayTimetable()
+    activate TimetableService
+
+    alt Есть в кэше и актуально
+        TimetableService --> TimetableCtrl: Cached data
+    else Кэш устарел
+        TimetableService -> ChuvsuAPI: Запрос новых данных
+        ChuvsuAPI --> TimetableService: Updated data
+        TimetableService -> TimetableService: Обновляет кэш
+        TimetableService --> TimetableCtrl: Fresh data
+    end
+
+    deactivate TimetableService
+    TimetableCtrl --> Client: Updated timetable
+    deactivate TimetableCtrl
+    Client --> User: Обновленное расписание
+end
+
+@enduml

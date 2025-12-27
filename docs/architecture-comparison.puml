@@ -1,0 +1,90 @@
+@startuml Architecture Comparison
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+
+title Сравнение архитектур - Старая vs Новая
+
+package "СТАРАЯ АРХИТЕКТУРА\nМонолитное Windows Forms приложение" as Old {
+    [Windows Forms UI] as OldUI
+    [TTApiManager\n(Синглтон)] as OldAPI
+    [TokenStore\n(Синглтон)] as OldToken
+    [Settings] as OldSettings
+
+    OldUI --> OldAPI
+    OldUI --> OldToken
+    OldUI --> OldSettings
+    OldAPI --> OldToken
+    OldAPI --> OldSettings
+}
+
+cloud "ЧувГУ API" as API1
+Old --> API1 : прямые запросы
+
+note right of Old
+  ❌ **Проблемы:**
+  - Только Windows
+  - Монолитная архитектура
+  - Дублирование кода
+  - Сложное тестирование
+  - Отсутствие переиспользования
+  - UI и логика связаны
+end note
+
+package "НОВАЯ АРХИТЕКТУРА\nРазделение Backend / Frontend" as New {
+
+    package "Backend (ASP.NET Core)" as Backend {
+        [REST API\nControllers] as Controllers
+        [Services\nБизнес-логика] as Services
+        [Storage\nДанные] as Storage
+
+        Controllers --> Services
+        Services --> Storage
+    }
+
+    package "Клиенты (легковесные)" as Clients {
+        [Windows Forms\nC#] as Client1
+        [Cinnamon Desklet\nJavaScript/GJS] as Client2
+        [KDE Plasma\nQML] as Client3
+        [GNOME Extension\nJavaScript/GJS] as Client4
+        [Python GTK\nPython] as Client5
+    }
+
+    Client1 -down-> Controllers : HTTP/REST
+    Client2 -down-> Controllers : HTTP/REST
+    Client3 -down-> Controllers : HTTP/REST
+    Client4 -down-> Controllers : HTTP/REST
+    Client5 -down-> Controllers : HTTP/REST
+}
+
+cloud "ЧувГУ API" as API2
+Backend --> API2 : централизованные запросы
+
+note right of New
+  ✅ **Преимущества:**
+  - Кросс-платформенность
+  - Единая бизнес-логика
+  - Множество клиентов
+  - Легкое тестирование
+  - Переиспользование кода
+  - Независимость UI и логики
+  - Нативная интеграция с DE
+end note
+
+note bottom of Backend
+  **Backend:**
+  - Windows + Linux support
+  - Кэширование расписания
+  - Безопасное хранение токенов
+  - REST API для всех клиентов
+end note
+
+note bottom of Clients
+  **Клиенты:**
+  - Только UI логика
+  - Нативные фреймворки
+  - Интеграция с DE
+  - Легковесные
+end note
+
+@enduml

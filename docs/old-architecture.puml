@@ -1,0 +1,68 @@
+@startuml Old Architecture - Windows Forms
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+
+title Старая архитектура - Windows Forms (C#)
+
+package "Windows Forms приложение" {
+
+    component [Program.cs\nТочка входа] as Program
+
+    package "UI Layer" {
+        component [Form1\nГлавное окно виджета\n(прозрачный оверлей)] as Form1
+        component [Form2\nДиалог авторизации] as Form2
+        component [Form3\nДиалог настроек] as Form3
+    }
+
+    package "Business Logic Layer" {
+        component [TTApiManager.cs\nСинглтон\n- API-вызовы\n- Бизнес-логика\n- Получение расписания] as TTApiManager
+        component [TokenStore.cs\nСинглтон\n- Управление токенами\n- Хранение учетных данных] as TokenStore
+        component [Settings.cs\nСервис настроек\n- Сохранение конфигурации\n- Параметры виджета] as Settings
+    }
+
+    package "Utilities" {
+        component [Logging.cs\nСистема логирования] as Logging
+    }
+}
+
+cloud "ЧувГУ API" as ChuvsuAPI {
+    interface "REST API\nonline.chuvsu.ru" as API
+}
+
+' Связи UI
+Program --> Form1 : запускает
+Form1 --> Form2 : открывает для\nавторизации
+Form1 --> Form3 : открывает для\nнастроек
+
+' Связи бизнес-логики
+Form1 --> TTApiManager : получает\nрасписание
+Form2 --> TTApiManager : авторизация
+Form3 --> Settings : читает/изменяет
+
+TTApiManager --> TokenStore : использует\nтокены
+TTApiManager --> Settings : использует\nнастройки
+TTApiManager --> API : HTTP запросы
+
+Form1 --> Logging : логирует события
+TTApiManager --> Logging : логирует запросы
+TokenStore --> Logging : логирует операции
+
+note right of TTApiManager
+  **Проблемы старой архитектуры:**
+  - Монолитность - вся логика в одном приложении
+  - Привязка к Windows Forms
+  - Невозможность переиспользования кода
+  - Сложность тестирования
+  - Отсутствие кросс-платформенности
+end note
+
+note left of Form1
+  **Особенности UI:**
+  - Прозрачное окно-оверлей
+  - Отображение на рабочем столе
+  - Drag & Drop перемещение
+end note
+
+@enduml

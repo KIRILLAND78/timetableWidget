@@ -25,10 +25,28 @@
 └────────────┘    └──────────────────┘
 ```
 
+### 📐 Детальная документация архитектуры
+
+Подробные **PlantUML диаграммы** архитектуры доступны в директории [`docs/`](docs/):
+
+- **[Старая архитектура](docs/old-architecture.puml)** - монолитное Windows Forms приложение
+- **[Новая архитектура](docs/new-architecture.puml)** - Backend + клиентские адаптеры
+- **[Сравнение архитектур](docs/architecture-comparison.puml)** - визуальное сравнение подходов
+- **[Диаграмма последовательности](docs/sequence-diagram.puml)** - процессы авторизации и получения расписания
+
+См. [docs/README.md](docs/README.md) для инструкций по просмотру и редактированию диаграмм.
+
 ## 📁 Структура проекта
 
 ```
 timetableWidget/
+├── docs/                         # 📐 Документация архитектуры
+│   ├── old-architecture.puml     # PlantUML диаграмма старой архитектуры
+│   ├── new-architecture.puml     # PlantUML диаграмма новой архитектуры
+│   ├── architecture-comparison.puml  # Сравнение архитектур
+│   ├── sequence-diagram.puml     # Диаграмма последовательности
+│   └── README.md                 # Инструкции по использованию диаграмм
+│
 ├── TimetableWidget.Backend/      # ASP.NET Core API бэкенд
 │   ├── Controllers/               # REST API контроллеры
 │   ├── Services/                  # Бизнес-логика

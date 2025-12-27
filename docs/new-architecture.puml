@@ -1,0 +1,124 @@
+@startuml New Architecture - Backend + Clients
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+
+title Новая архитектура - Backend + Клиентские адаптеры
+
+cloud "ЧувГУ API" as ChuvsuAPI {
+    interface "REST API\nonline.chuvsu.ru" as ExternalAPI
+}
+
+package "Backend - ASP.NET Core Web API" {
+    component [Program.cs\nТочка входа\nKestrel Server] as BackendProgram
+
+    package "REST API Controllers" {
+        component [TimetableController\nGET /api/timetable/*\n- today\n- tomorrow\n- week] as TimetableController
+        component [AuthController\nPOST /api/auth/login\n- login\n- logout] as AuthController
+        component [SettingsController\nGET/PUT /api/settings\n- get/update settings] as SettingsController
+    }
+
+    package "Services (Business Logic)" {
+        component [TimetableService\n- Получение расписания\n- Кэширование данных\n- Парсинг API] as TimetableService
+        component [TokenStoreService\n- Управление токенами\n- Шифрование\n- DPAPI/File-based] as TokenStoreService
+        component [SettingsService\n- Управление настройками\n- JSON persistence] as SettingsService
+    }
+
+    package "Storage" {
+        database [settings.json\ntokens.encrypted] as Storage
+    }
+}
+
+package "Клиентские адаптеры" {
+
+    package "Windows Forms" as WinForms {
+        component [Form1\nГлавное окно] as WF_Form1
+        component [API Client\nHTTP запросы] as WF_Client
+    }
+
+    package "Cinnamon Desklet" as Cinnamon {
+        component [desklet.js\nGJS/JavaScript] as Cinnamon_Main
+        component [HTTP Client\nGLib.Soup] as Cinnamon_Client
+        component [GTK Dialogs\nАвторизация] as Cinnamon_UI
+    }
+
+    package "KDE Plasma Widget" as KDE {
+        component [main.qml\nQML Interface] as KDE_Main
+        component [HTTP Client\nQt.network] as KDE_Client
+        component [Qt Dialogs\nАвторизация] as KDE_UI
+    }
+
+    package "GNOME Shell Extension" as GNOME {
+        component [extension.js\nGJS/JavaScript] as GNOME_Main
+        component [HTTP Client\nGLib.Soup] as GNOME_Client
+        component [Modal Dialogs\nАвторизация] as GNOME_UI
+    }
+
+    package "Python GTK" as PyGTK {
+        component [main.py\nPython + GTK3] as PyGTK_Main
+        component [HTTP Client\nrequests] as PyGTK_Client
+        component [GTK Dialogs\nUI компоненты] as PyGTK_UI
+    }
+}
+
+' Backend connections
+BackendProgram --> TimetableController
+BackendProgram --> AuthController
+BackendProgram --> SettingsController
+
+TimetableController --> TimetableService
+AuthController --> TokenStoreService
+SettingsController --> SettingsService
+
+TimetableService --> ExternalAPI : HTTP запросы
+TokenStoreService --> Storage : read/write
+SettingsService --> Storage : read/write
+
+' Client to Backend connections
+WF_Form1 --> WF_Client
+WF_Client --> BackendProgram : HTTP/REST\nlocalhost:5678
+
+Cinnamon_Main --> Cinnamon_Client
+Cinnamon_Main --> Cinnamon_UI
+Cinnamon_Client --> BackendProgram : HTTP/REST\nlocalhost:5678
+
+KDE_Main --> KDE_Client
+KDE_Main --> KDE_UI
+KDE_Client --> BackendProgram : HTTP/REST\nlocalhost:5678
+
+GNOME_Main --> GNOME_Client
+GNOME_Main --> GNOME_UI
+GNOME_Client --> BackendProgram : HTTP/REST\nlocalhost:5678
+
+PyGTK_Main --> PyGTK_Client
+PyGTK_Main --> PyGTK_UI
+PyGTK_Client --> BackendProgram : HTTP/REST\nlocalhost:5678
+
+note top of BackendProgram
+  **Backend преимущества:**
+  - Единая бизнес-логика для всех клиентов
+  - Кросс-платформенность (Windows/Linux)
+  - Кэширование расписания
+  - Безопасное хранение токенов
+  - REST API для любых клиентов
+  - Автозапуск как системный сервис
+end note
+
+note bottom of Cinnamon
+  **Клиентские адаптеры:**
+  - Легковесные
+  - Используют нативные UI фреймворки
+  - Только UI логика
+  - Интеграция с DE
+  - Общий API бэкенда
+end note
+
+note right of Storage
+  **Безопасность:**
+  - Windows: DPAPI шифрование
+  - Linux: File-based encryption
+  - Токены никогда не в plaintext
+end note
+
+@enduml
